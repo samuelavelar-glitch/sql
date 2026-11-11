@@ -1,0 +1,38 @@
+CREATE TABLE cliente(
+id_cliente INTEGER PRIMARY KEY,
+nome VARCHAR (100) NOT NULL,
+cpf VARCHAR(14) NOT NULL,
+email VARCHAR(100) NOT NULL
+);
+CREATE TABLE contatos(
+id_contato INTEGER PRIMARY KEY,
+telefone varchar(50) not null,
+id_cliente INTEGER NOT NULL,
+FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente)
+);
+CREATE TABLE enderecos(
+id_endereco INTEGER PRIMARY KEY,
+rua VARCHAR(100) NOT NULL,
+numero VARCHAR (20) NOT NULL,
+cep VARCHAR(14) NOT NULL,
+cidade VARCHAR (100) NOT NULL,
+estado VARCHAR(30) NOT NULL,
+id_cliente INTEGER NOT NULL,
+FOREIGN KEY (id_cliente) REFERENCES cliente(id_cliente)
+);
+CREATE TABLE veiculos(
+id_veiculos INTEGER PRIMARY KEY,
+placa VARCHAR(8) NOT NULL,
+modelo VARCHAR(100) NOT NULL,
+marca VARCHAR(100) NOT NULL,
+ano_fab INTEGER NOT NULL
+);
+CREATE TABLE ordens_servicos(
+id_ordens_servicos INTEGER PRIMARY KEY,
+indenificador VARCHAR(50) NOT NULL,
+data_abertura DATE NOT NULL,
+data_conclusão DATE NOT NULL,
+status VARCHAR(50) NOT NULL,
+id_veiculos INTEGER NOT NULL,
+FOREIGN KEY (id_veiculos) REFERENCES veiculos (id_veiculos)
+);
