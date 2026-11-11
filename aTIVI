@@ -95,58 +95,70 @@ CREATE TABLE ordens_servicos_produtos (
     FOREIGN KEY (id_ordem_servico) REFERENCES ordens_servicos(id_ordem_servico),
     FOREIGN KEY (id_produto) REFERENCES produtos(id_produto)
 );
+
 INSERT INTO clientes(idcliente,nome,cpf,email)VALUES 
-(1,'Marcos','123.456.789-10',markin@email.com),
-(2,'Pedro','127.757.989-14',pedrin@email.com),
-(3,'Luan','345.553.489-24',luan456@email.com);
+(1,'Marcos','123.456.789-10','markin@email.com'),
+(2,'Pedro','127.757.989-14','pedrin@email.com'),
+(3,'Luan','345.553.489-24','luan456@email.com'),
+(4, 'Lucas', '444.555.666-77', 'lucas@email.com');
+
 INSERT INTO enderecos (id_endereco, rua, numero, cep, cidade, estado, idcliente)VALUES 
 (1, 'Rua das Flores', '123', '38740-000', 'Patrocínio', 'MG', 1),
 (2, 'Avenida Brasil', '456', '38740-111', 'Patrocínio', 'MG', 2),
 (3, 'Avenida Goiania', '357', '38740-561', 'Patrocínio', 'MG', 3);
+
 INSERT INTO contatos_clientes (id_contato, telefone, idcliente) VALUES 
 (1, '34999991234', 1),
 (2, '34999995678', 2),
 (3, '34999335673', 3);
+
 INSERT INTO mecanicos (idmecanico, especialidade, nome) VALUES 
 (1, 'Motor', 'João Pereira'),
 (2, 'Elétrica', 'Marcos Oliveira'),
 (3, 'Calibragem', 'Samuel Honorato');
+
 INSERT INTO contatos_mecanicos (id_contato, telefone, idmecanico) VALUES 
 (1, '34988881111', 1),
 (2, '34988882222', 2),
 (3, '34988883333', 3);
+
 INSERT INTO veiculos (id_veiculo, placa, modelo, marca, ano, idcliente) VALUES 
 (1, 'ABC1D23', 'Civic', 'Honda', 2020, 1),
 (2, 'XYZ9W87', 'Corolla', 'Toyota', 2021, 2),
-(3, 'XUZ8F67', 'Renegate', 'Jeep', 2022, 3);
-(3, 'XUZ4F67', 'Golf', 'Volkswagen', 2021, 4);
+(3, 'XUZ8F67', 'Renegate', 'Jeep', 2022, 3),
+(4, 'XUZ4F67', 'Golf', 'Volkswagen', 2021, 4);
 INSERT INTO ordens_servicos (id_ordem_servico, identificador, data_abertura, data_conclusao, status, id_veiculo) VALUES 
 (1, 'OS-001', '2023-10-05', '2023-10-06', 'Aberto', 1),
 (2, 'OS-002', '2023-10-08', '2023-10-09', 'Em Andamento', 2),
-(3, 'OS-003', '2023-10-11', '2023-10-12', 'Em Espera', 3);
+(3, 'OS-003', '2023-10-11', '2023-10-12', 'Em Espera', 3),
 (4, 'OS-004', '2023-10-14', '2023-10-15', 'Em finalização', 4);
+
 INSERT INTO servicos (id_servico, descricao, valor_base) VALUES 
 (1, 'Troca de Óleo', 150.00),
 (2, 'Revisão Elétrica', 200.00),
 (3, 'Troca de Pneus', 130.00),
 (4, 'Calibragem de Eixo',300.00);
+
 INSERT INTO produtos (id_produto, nome, preco_unit) VALUES 
 (1, 'Óleo de Motor 5W30', 50.00),
 (2, 'Filtro de Óleo', 35.00),
 (3, 'Kit 4 pneus', 350.00),
 (4, 'Kit Desemgripante', 149.99);
+
 INSERT INTO ordens_servicos_mecanicos (id_ordem_servico, idmecanico) VALUES 
 (1, 1),
 (2, 2),
 (3, 3),
 (4, 3);
+
 INSERT INTO ordens_servicos_servicos (id_ordem_servico, id_servico, quatidade, valor_cobrado) VALUES 
 (1, 1, 1, 150.00),
-(2, 2, 1, 200.00);
-(3, 3, 2, 130.00);
+(2, 2, 1, 200.00),
+(3, 3, 2, 130.00),
 (4, 3, 1, 149.99);
+
 INSERT INTO ordens_servicos_produtos (id_ordem_servico, id_produto, quantidade, preco_aplicado) VALUES 
 (1, 1, 4.0, 50.00),
-(1, 2, 1.0, 35.00);
-(2, 1, 2.0, 35.00);
+(1, 2, 1.0, 35.00),
+(2, 1, 2.0, 35.00),
 (3, 3, 2.0, 350.00);
