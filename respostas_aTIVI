@@ -1,0 +1,39 @@
+SELECT*FROM veiculos WHERE ano BETWEEN 2018 AND 2022;
+
+SELECT*FROM ordens_servicos WHERE status='Aberto'OR status='Em Andamento';
+
+SELECT*FROM mecanicos WHERE especialidade='Motor'OR especialidade='Elétrica';
+
+SELECT*FROM contatos_clientes WHERE telefone LIKE'3499999%';
+
+SELECT*FROM veiculos WHERE marca IN('Honda','Jeep','Toyota');
+
+SELECT*FROM ordens_servicos WHERE data_abertura BETWEEN'2023-10-01'AND'2023-10-10';
+
+SELECT*FROM enderecos WHERE cidade='Patrocínio'AND estado='MG';
+
+SELECT*FROM clientes WHERE email LIKE'%email%';
+
+SELECT*FROM produtos WHERE preco_unit BETWEEN 30 AND 150;
+
+SELECT*FROM ordens_servicos WHERE status<>'Concluido'AND data_abertura>'2023-10-05';
+
+SELECT MIN(preco_unit)AS menor_preco FROM produtos;
+
+SELECT MAX(valor_base)AS maior_valor FROM servicos;
+
+SELECT AVG(preco_unit)AS media_precos FROM produtos;
+
+SELECT SUM(valor_cobrado)AS total_servicos FROM ordens_servicos_servicos;
+
+SELECT COUNT(*)AS total_veiculos FROM veiculos;
+
+SELECT marca,COUNT(*)AS quantidade FROM veiculos GROUP BY marca;
+
+SELECT id_ordem_servico,SUM(valor_cobrado)AS total_cobrado FROM ordens_servicos_servicos GROUP BY id_ordem_servico;
+
+SELECT id_ordem_servico,AVG(preco_aplicado)AS media_preco_aplicado FROM ordens_servicos_produtos GROUP BY id_ordem_servico;
+
+SELECT marca,COUNT(*)AS quantidade FROM veiculos GROUP BY marca HAVING COUNT(*)>1;
+
+SELECT id_ordem_servico,SUM(valor_cobrado)AS total_cobrado FROM ordens_servicos_servicos GROUP BY id_ordem_servico HAVING SUM(valor_cobrado)>100;
