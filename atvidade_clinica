@@ -1,0 +1,218 @@
+
+CREATE TABLE planos_saude(
+id_plano_saude INTEGER PRIMARY KEY,
+nome_operadora VARCHAR(30) NOT NULL,
+telefone VARCHAR(14)NOT NULL
+);
+CREATE TABLE  procedimentos(
+id_procedimentos INTEGER PRIMARY KEY,
+nome VARCHAR(100) NOT NULL,
+descricao VARCHAR(200) NOT NULL,
+custo DOUBLE PRECISION NOT NULL
+);
+CREATE TABLE medicamentos (
+id_medicamento INTEGER PRIMARY KEY,
+nome_comercial VARCHAR(100) NOT NULL,
+principal_ativo VARCHAR(200) NOT NULL,
+fabricante VARCHAR(100)NOT NULL
+);
+CREATE TABLE especialidades(
+id_especialidade INTEGER PRIMARY KEY,
+nome VARCHAR(100)NOT NULL,
+descricao VARCHAR(100) NOT NULL
+);
+CREATE TABLE pacientes(
+id_paciente INTEGER PRIMARY KEY,
+nome VARCHAR(100) NOT NULL,
+data_nascimento DATE NOT NULL,
+sexo VARCHAR(10) NOT NULL,
+cpf VARCHAR(14) NOT NULL,
+id_plano_saude INTEGER NOT NULL,
+FOREIGN KEY (id_plano_saude )REFERENCES planos_saude(id_plano_saude)
+);
+CREATE TABLE medicos(
+id_medico INTEGER PRIMARY KEY,
+nome VARCHAR (100) NOT NULL,
+crm VARCHAR(100) NOT NULL,
+telefone VARCHAR (12) NOT NULL,
+id_especialidade INTEGER NOT NULL,
+FOREIGN KEY (id_especialidade) REFERENCES especialidades (id_especialidade)
+);
+CREATE TABLE enderecos(
+id_endereco INTEGER PRIMARY KEY,
+rua VARCHAR(100) NOT NULL,
+numero VARCHAR(10) NOT NULL,
+bairro VARCHAR(100)NOT NULL,
+cidade VARCHAR(80)NOT NULL,
+estado VARCHAR(50) NOT NULL,
+id_paciente INTEGER NOT NULL,
+FOREIGN KEY (id_paciente) REFERENCES pacientes (id_paciente)
+);
+CREATE TABLE contatos(
+id_contato INTEGER PRIMARY KEY,
+tipo_contato VARCHAR(20)NOT NULL,
+telefone VARCHAR(14)NOT NULL,
+id_paciente INTEGER NOT NULL,
+FOREIGN KEY (id_paciente) REFERENCES pacientes (id_paciente)
+);
+CREATE TABLE consultas(
+id_consultas INTEGER PRIMARY KEY,
+numero_registro INTEGER NOT NULL,
+data_consulta DATE NOT NULL,
+horario TIME NOT NULL,
+observacoes VARCHAR(1000) NOT NULL,
+id_paciente INTEGER NOT NULL,
+id_medico INTEGER NOT NULL,
+FOREIGN KEY (id_paciente) REFERENCES pacientes (id_paciente),
+FOREIGN KEY (id_medico) REFERENCES medicos (id_medico) 
+);
+CREATE TABLE consultas_medicamento(
+id_consultas INTEGER NOT NULL,
+id_medicamento INTEGER NOT NULL,
+dosagem DOUBLE PRECISION NOT NULL,
+frequencia_uso VARCHAR(150) NOT NULL,
+duracao_tratamento VARCHAR(20)NOT NULL,
+observacoes VARCHAR(100) NOT NULL,
+PRIMARY KEY(id_consultas ,id_medicamento),
+FOREIGN KEY (id_consultas) REFERENCES consultas (id_consultas),
+FOREIGN KEY (id_medicamento) REFERENCES medicamentos (id_medicamento)
+);
+CREATE TABLE consultas_procedimentos(
+id_consultas INTEGER NOT NULL,
+id_procedimentos INTEGER NOT NULL,
+data_realizacao DATE NOT NULL,
+quantidade DOUBLE PRECISION NOT NULL,
+valor_cobrado DOUBLE PRECISION NOT NULL,
+PRIMARY KEY(id_consultas ,id_procedimentos),
+FOREIGN KEY (id_consultas) REFERENCES consultas (id_consultas),
+FOREIGN KEY (id_procedimentos) REFERENCES procedimentos (id_procedimentos)
+);
+INSERT INTO planos_saude (id_plano_saude, nome_operadora, telefone) VALUES
+(1, 'Unimed', '0800111111'),
+(2, 'Amil', '0800222222'),
+(3, 'Bradesco Saúde', '0800333333'),
+(4, 'SulAmérica', '0800444444'),
+(5, 'NotreDame', '0800555555'),
+(6, 'Hapvida', '0800666666'),
+(7, 'Prevent Senior', '0800777777'),
+(8, 'Porto Seguro', '0800888888'),
+(9, 'Golden Cross', '0800999999'),
+(10, 'Particular', '0800000000');
+INSERT INTO procedimentos (id_procedimentos, nome, descricao, custo) VALUES
+(1, 'Consulta Simples', 'Avaliação clínica geral', 150.00),
+(2, 'Eletrocardiograma', 'Exame do coração', 80.00),
+(3, 'Raio-X Tórax', 'Radiografia do tórax', 120.00),
+(4, 'Ultrassom Abdominal', 'Ultrassonografia', 200.00),
+(5, 'Exame de Sangue', 'Hemograma completo', 50.00),
+(6, 'Endoscopia', 'Endoscopia digestiva alta', 400.00),
+(7, 'Ressonância Magnética', 'RM do crânio', 800.00),
+(8, 'Curativo Simples', 'Limpeza e curativo', 30.00),
+(9, 'Sutura', 'Pequena cirurgia de sutura', 100.00),
+(10, 'Terapia Inalatória', 'Inalação com medicamento', 40.00);
+INSERT INTO medicamentos (id_medicamento, nome_comercial, principio_ativo, fabricante) VALUES
+(1, 'Dipirona', 'Dipirona Sódica', 'Medley'),
+(2, 'Amoxil', 'Amoxicilina', 'GSK'),
+(3, 'Tylenol', 'Paracetamol', 'Johnson'),
+(4, 'Roacutan', 'Isotretinoína', 'Roche'),
+(5, 'Glifage', 'Metformina', 'Merck'),
+(6, 'Losartana', 'Losartana Potássica', 'Neo Química'),
+(7, 'Omeprazol', 'Omeprazol', 'EMS'),
+(8, 'Neosaldina', 'Dipirona + Isometepteno', 'Takeda'),
+(9, 'Rivotril', 'Clonazepam', 'Roche'),
+(10, 'Aspirina', 'Ácido Acetilsalicílico', 'Bayer');
+INSERT INTO especialidades (id_especialidade, nome, descricao) VALUES
+(1, 'Clínica Médica', 'Atendimento geral e preventivo'),
+(2, 'Cardiologia', 'Tratamento de doenças do coração'),
+(3, 'Ortopedia', 'Tratamento de ossos e músculos'),
+(4, 'Pediatria', 'Saúde infantil e neonatal'),
+(5, 'Dermatologia', 'Doenças de pele e anexos'),
+(6, 'Ginecologia', 'Saúde da mulher'),
+(7, 'Neurologia', 'Distúrbios do sistema nervoso'),
+(8, 'Oftalmologia', 'Saúde e doenças dos olhos'),
+(9, 'Psiquiatria', 'Saúde mental e transtornos'),
+(10, 'Endocrinologia', 'Hormônios e metabolismo');
+INSERT INTO medicos (id_medico, nome, crm, telefone, id_especialidade) VALUES
+(1, 'Dr. Roberto', '12345-MG', '3499991111', 1),
+(2, 'Dra. Carla', '23456-MG', '3499992222', 2),
+(3, 'Dr. Marcos', '34567-MG', '3499993333', 3),
+(4, 'Dra. Julia', '45678-MG', '3499994444', 4),
+(5, 'Dr. Fernando', '56789-MG', '3499995555', 5),
+(6, 'Dra. Amanda', '67890-MG', '3499996666', 6),
+(7, 'Dr. Lucas', '78901-MG', '3499997777', 7),
+(8, 'Dra. Beatriz', '89012-MG', '3499998888', 8),
+(9, 'Dr. Paulo', '90123-MG', '3499999999', 9),
+(10, 'Dr. Felipe', '92122-MG', '3499999990', 10),
+(11, 'Dra. Renata', '01234-MG', '3499990000', 11);
+INSERT INTO pacientes (id_paciente, nome, data_nascimento, sexo, cpf, id_plano_saude) VALUES
+(1, 'José Silva', '1980-05-10', 'M', '11111111111', 1),
+(2, 'Maria Oliveira', '1992-08-15', 'F', '22222222222', 2),
+(3, 'Antônio Costa', '1975-11-20', 'M', '33333333333', 3),
+(4, 'Ana Santos', '2001-02-25', 'F', '44444444444', 4),
+(5, 'João Pereira', '1988-06-30', 'M', '55555555555', 5),
+(6, 'Francisca Lima', '1965-09-05', 'F', '66666666666', 6),
+(7, 'Carlos Alves', '1995-12-10', 'M', '77777777777', 7),
+(8, 'Paula Gomes', '1982-03-15', 'F', '88888888888', 8),
+(9, 'Luiz Martins', '1970-07-20', 'M', '99999999999', 9),
+(10, 'Fernanda Rocha', '1998-10-25', 'F', '00000000000', 10),
+(11, 'Zé da Rocha', '1969-11-24', 'M', '00000000006', 11);
+INSERT INTO enderecos (id_endereco, rua, numero, bairro, cidade, estado, id_paciente) VALUES
+(1, 'Rua A', '10', 'Centro', 'Uberlândia', 'MG', 1),
+(2, 'Rua B', '20', 'Martins', 'Uberlândia', 'MG', 2),
+(3, 'Rua C', '30', 'Osvaldo', 'Uberlândia', 'MG', 3),
+(4, 'Rua D', '40', 'Fundinho', 'Uberlândia', 'MG', 4),
+(5, 'Rua E', '50', 'Tubalina', 'Uberlândia', 'MG', 5),
+(6, 'Rua F', '60', 'Planalto', 'Uberlândia', 'MG', 6),
+(7, 'Rua G', '70', 'Lidice', 'Uberlândia', 'MG', 7),
+(8, 'Rua H', '80', 'Cazeca', 'Uberlândia', 'MG', 8),
+(9, 'Rua I', '90', 'Morumbi', 'Uberlândia', 'MG', 9),
+(10, 'Rua J', '100', 'Aclimação', 'Uberlândia', 'MG', 10),
+(11, 'Rua K', '110', 'Santa Mônica', 'Uberlândia', 'MG', 11);
+INSERT INTO contatos (id_contato, tipo_contato, telefone, id_paciente) VALUES
+(1, 'Celular', '34988881111', 1),
+(2, 'Residencial', '3438212222', 2),
+(3, 'Celular', '34988883333', 3),
+(4, 'Trabalho', '3438214444', 4),
+(5, 'Celular', '34988885555', 5),
+(6, 'Residencial', '3438216666', 6),
+(7, 'Celular', '34988887777', 7),
+(8, 'Trabalho', '3438218888', 8),
+(9, 'Celular', '34988889999', 9),
+(10, 'Residencial', '3438210000', 10),
+(11, 'Celular', '34988880000', 11);
+INSERT INTO consultas (id_consultas, numero_registro, data_consulta, horario, observacoes, id_paciente, id_medico) VALUES
+(1, 1001, '2023-11-01', '08:00', 'Paciente com dores', 1, 1),
+(2, 1002, '2023-11-02', '09:00', 'Check-up anual', 2, 2),
+(3, 1003, '2023-11-03', '10:00', 'Dor articular', 3, 3),
+(4, 1004, '2023-11-04', '11:00', 'Febre e tosse', 4, 4),
+(5, 1005, '2023-11-05', '14:00', 'Alergia cutânea', 5, 5),
+(6, 1006, '2023-11-06', '15:00', 'Rotina feminina', 6, 6),
+(7, 1007, '2023-11-07', '16:00', 'Enxaqueca forte', 7, 7),
+(8, 1008, '2023-11-08', '08:30', 'Exame de vista', 8, 8),
+(9, 1009, '2023-11-09', '09:30', 'Crise de ansiedade', 9, 9),
+(10, 1010, '2023-11-10', '10:30', 'Ajuste de insulina', 10, 10),
+(11, 1011, '2023-11-11', '11:00', 'Paciente com dor nas costas', 11, 11);
+INSERT INTO consultas_procedimentos (id_procedimentos, id_consultas, data_realizacao, quantidade, valor_cobrado) VALUES
+(1, 1, '2023-11-01', 1, 150.00),
+(2, 2, '2023-11-02', 1, 80.00),
+(3, 3, '2023-11-03', 1, 120.00),
+(4, 4, '2023-11-04', 1, 200.00),
+(5, 5, '2023-11-05', 1, 50.00),
+(6, 6, '2023-11-06', 1, 400.00),
+(7, 7, '2023-11-07', 1, 800.00),
+(8, 8, '2023-11-08', 1, 30.00),
+(9, 9, '2023-11-09', 1, 100.00),
+(10, 10, '2023-11-10', 1, 40.00),
+(1, 11, '2023-11-11', 1, 150.00);
+INSERT INTO consultas_medicamentos (id_consultas, id_medicamento, dosagem, frequencia_uso, duracao_tratamento, observacoes) VALUES
+(1, 1, 500, '8/8h', '5 dias', 'Após refeições'),
+(2, 2, 875, '12/12h', '7 dias', 'Com água'),
+(3, 3, 750, '6/6h', '3 dias', 'Se dor'),
+(4, 4, 20, '1x dia', '30 dias', 'Uso contínuo'),
+(5, 5, 500, 'Após almoço', 'Contínuo', 'Sem açúcar'),
+(6, 6, 50, '12/12h', 'Contínuo', 'Aferir pressão'),
+(7, 7, 20, 'Jejum', '30 dias', 'Antes café'),
+(8, 8, 1, '6/6h', 'Se dor', 'Gotas'),
+(9, 9, 2, 'Noite', 'Contínuo', 'Tarja preta'),
+(10, 10, 100, '1x dia', 'Contínuo', 'Prevenção'),
+(11, 1, 500, '8/8h', '5 dias', 'Após refeições');
+
