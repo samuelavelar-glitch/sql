@@ -215,4 +215,120 @@ INSERT INTO consultas_medicamentos (id_consultas, id_medicamento, dosagem, frequ
 (9, 9, 2, 'Noite', 'Contínuo', 'Tarja preta'),
 (10, 10, 100, '1x dia', 'Contínuo', 'Prevenção'),
 (11, 1, 500, '8/8h', '5 dias', 'Após refeições');
+///// respostas ////
+1 Nome e CRM dos médicos das especialidades 1, 2, 3 ou 4
+SELECT nome, crm 
+FROM medicos 
+WHERE id_especialidade IN (1, 2, 3, 4);
 
+2 Nome e descrição dos procedimentos com a palavra "Teste"
+SELECT nome, descricao 
+FROM procedimentos 
+WHERE descricao LIKE '%Teste%';
+
+ 3 Nome e data de nascimento dos pacientes nascidos entre '1990-01-01' e '1995-12-31'
+SELECT nome, data_nascimento 
+FROM pacientes 
+WHERE data_nascimento BETWEEN '1990-01-01' AND '1995-12-31';
+
+4 Nome comercial e fabricante dos medicamentos cujo ID não seja 2, 4, 6, 8 ou 10
+SELECT nome_comercial, fabricante 
+FROM medicamentos 
+WHERE id_medicamento NOT IN (2, 4, 6, 8, 10);
+
+5 Número de registro, data e horário das consultas com observação preenchida
+SELECT numero_registro, data_consulta, horario 
+FROM consultas 
+WHERE observacoes IS NOT NULL AND observacoes <> '';
+
+6 Nome de cada paciente e nome do plano de saúde vinculado
+SELECT p.nome AS paciente, ps.nome_operadora AS plano_saude
+FROM pacientes p
+JOIN planos_saude ps ON p.id_plano_saude = ps.id_plano_saude;
+
+ 7 Nome do médico, CRM e nome da especialidade
+SELECT m.nome AS medico, m.crm, e.nome AS especialidade
+FROM medicos m
+JOIN especialidades e ON m.id_especialidade = e.id_especialidade;
+
+ 8 Todos os planos de saúde e seus pacientes (incluindo planos sem pacientes)
+SELECT ps.nome_operadora AS plano_saude, p.nome AS paciente
+FROM planos_saude ps
+LEFT JOIN pacientes p ON ps.id_plano_saude = p.id_plano_saude;
+
+ 9 Número de registro das consultas e nome de todos os médicos (incluindo os sem consulta)
+SELECT c.numero_registro, m.nome AS medico
+FROM medicos m
+LEFT JOIN consultas c ON m.id_medico = c.id_medico;
+
+ 10 Pacientes sem endereço cadastrado (filtrando com IS NULL)
+SELECT p.nome
+FROM pacientes p
+LEFT JOIN enderecos e ON p.id_paciente = e.id_paciente
+WHERE e.id_endereco IS NULL;
+
+11 Custo do procedimento mais barato e mais caro
+SELECT MIN(custo) AS procedimento_mais_barato, MAX(custo) AS procedimento_mais_caro
+FROM procedimentos;
+
+12. Média de custo de todos os procedimentos
+SELECT AVG(custo) AS media_custo
+FROM procedimentos;
+
+13 Valor total arrecadado em consultas_procedimentos
+SELECT SUM(valor_cobrado) AS valor_total_arrecadado
+FROM consultas_procedimentos;
+
+ 14. Data de nascimento do paciente mais velho
+SELECT MIN(data_nascimento) AS data_nascimento_paciente_mais_velho
+FROM pacientes;
+
+15 Quantidade total de pacientes agrupados por sexo
+SELECT sexo, COUNT(*) AS quantidade_pacientes
+FROM pacientes
+GROUP BY sexo;
+
+ 16 Nome de cada plano de saúde e total de pacientes que o utilizam
+SELECT ps.nome_operadora, COUNT(p.id_paciente) AS total_pacientes
+FROM planos_saude ps
+LEFT JOIN pacientes p ON ps.id_plano_saude = p.id_plano_saude
+GROUP BY ps.id_plano_saude, ps.nome_operadora;
+
+17 ID da consulta e valor total cobrado pelos procedimentos em cada uma
+SELECT id_consultas, SUM(valor_cobrado) AS valor_total_procedimentos
+FROM consultas_procedimentos
+GROUP BY id_consultas;
+
+18 ID do médico e quantidade de consultas (apenas médicos com 2 ou mais consultas)
+SELECT id_medico, COUNT(*) AS total_consultas
+FROM consultas
+GROUP BY id_medico
+HAVING COUNT(*) >= 2;
+
+19 Nome das especialidades e quantidade de médicos (apenas com mais de 1 médico)
+SELECT e.nome AS especialidade, COUNT(m.id_medico) AS total_medicos
+FROM especialidades e
+JOIN medicos m ON e.id_especialidade = m.id_especialidade
+GROUP BY e.id_especialidade, e.nome
+HAVING COUNT(m.id_medico) > 1;
+
+ 20 Nome de cada paciente e a data da sua consulta mais recente
+SELECT p.nome AS paciente, MAX(c.data_consulta) AS consulta_mais_recente
+FROM pacientes p
+JOIN consultas c ON p.id_paciente = c.id_paciente
+GROUP BY p.id_paciente, p.nome;
+
+ 1 Adicionar coluna email na tabela pacientes
+ALTER TABLE pacientes ADD COLUMN email VARCHAR(100);
+
+2 Alterar tipo de dado da coluna telefone em medicos para VARCHAR(15)
+ALTER TABLE medicos ALTER COLUMN telefone TYPE VARCHAR(15);
+
+ 3 Excluir coluna observacoes da tabela consultas_medicamento
+ALTER TABLE consultas_medicamento DROP COLUMN observacoes;
+
+ 4 Renomear coluna custo de procedimentos para valor_padrao
+ALTER TABLE procedimentos RENAME COLUMN custo TO valor_padrao;
+
+ 5 Excluir permanentemente a tabela contatos
+DROP TABLE contatos;
