@@ -1,0 +1,142 @@
+-- 1. Pedidos com cliente, armazém de origem, destino e forma de pagamento
+SELECT 
+    p.id_pedido,
+    c.nome_razao_social AS cliente,
+    a.nome_armazem AS armazem_origem,
+    e.municipio,
+    e.estado,
+    p.valor_pedido,
+    COALESCE(dp.forma_pagamento, 'Não informado') AS forma_pagamento
+FROM pedidos p
+JOIN clientes c ON p.id_cliente = c.id_cliente
+JOIN armazens a ON p.id_armazem_origem = a.id_armazem
+JOIN enderecos e ON p.id_endereco_entrega = e.id_endereco
+LEFT JOIN dados_pagamentos dp ON p.id_pedido = dp.id_pedido
+ORDER BY p.id_pedido;
+
+-- 2. Total pago e quantidade de transações por forma de pagamento (com HAVING)
+SELECT 
+    forma_pagamento,
+    COUNT(*) AS qtd_pagamentos,
+    SUM(valor_pagamento) AS total_pago
+FROM dados_pagamentos
+GROUP BY forma_pagamento
+HAVING SUM(valor_pagamento) >= 1000.00
+ORDER BY total_pago DESC;
+
+-- 3. Rotas com veículo, motorista com CNH válida e sequência das entregas
+SELECT 
+   r.id_rota,
+    r.origem,
+    r.destino,
+    v.placa,
+    m.nome AS motorista,
+    rp.ordem_entrega,
+    p.id_pedido
+FROM rotas r
+JOIN veiculos v ON r.id_veiculo = v.id_veiculo
+JOIN motoristas m ON r.id_motorista = m.id_motorista
+JOIN rotas_pedidos rp ON r.id_rota = rp.id_rota
+JOIN pedidos p ON rp.id_pedido = p.id_pedido
+WHERE m.valida = TRUE
+ORDER BY r.id_rota, rp.ordem_entrega;
+
+-- 4. Quanto cada veículo já gastou em manutenção (com COALESCE)
+SELECT 
+    v.placa,
+    v.conservacao_veiculo,
+    COALESCE(SUM(mn.custo), 0) AS custo_manutencao
+FROM veiculos v
+LEFT JOIN manutencoes mn ON v.id_veiculo = mn.id_veiculo
+GROUP BY v.id_veiculo, v.placa, v.conservacao_veiculo
+ORDER BY custo_manutencao DESC;
+
+-- 5. Itens de cada pedido com o subtotal de cada linha
+SELECT 
+    p.id_pedido,
+    c.nome_razao_social AS cliente,
+    ip.descricao_item,
+    ip.qtd_item,
+    ip.valor_unit,
+    (ip.qtd_item * ip.valor_unit) AS subtotal
+FROM itens_pedido ip
+JOIN pedidos p ON ip.id_pedido = p.id_pedido
+JOIN clientes c ON p.id_cliente = c.id_cliente
+ORDER BY p.id_pedido, ip.id_item;
+
+-- 6. Motoristas com CNH válida que ainda não estão em nenhuma rota (NOT EXISTS)
+SELECT 
+    m.id_motorista,
+    m.nome,
+    m.cnh,
+    m.tipo_cnh
+FROM motoristas m
+WHERE m.valida = TRUE
+  AND NOT EXISTS (
+      SELECT 1
+      FROM rotas r
+      WHERE r.id_motorista = m.id_motorista
+  )
+ORDER BY m.nome;
+
+-- 7. Quantidade de funcionários e custo de armazenagem por armazém
+SELECT 
+    a.nome_armazem,
+    a.local_armazem,
+    a.custo_armazenagem,
+    COUNT(f.id_funcionario) AS qtd_funcionarios
+FROM armazens a
+LEFT JOIN funcionarios f ON a.id_armazem = f.id_armazem
+GROUP BY a.id_armazem, a.nome_armazem, a.local_armazem, a.custo_armazenagem
+ORDER BY a.id_armazem;
+
+-- 8. Pedidos com valor acima da média geral
+SELECT 
+    p.id_pedido,
+    c.nome_razao_social AS cliente,
+    p.local_pedido,
+    p.valor_pedido,
+    p.status_pedido
+FROM pedidos p
+JOIN clientes c ON p.id_cliente = c.id_cliente
+WHERE p.valor_pedido > (SELECT AVG(valor_pedido) FROM pedidos)
+ORDER BY p.valor_pedido DESC;
+
+-- 9. Quantidade de rotas e distância total por veículo (com COALESCE)
+SELECT 
+    v.placa,
+    v.capacidade_peso_kg,
+    COUNT(r.id_rota) AS qtd_rotas,
+    COALESCE(SUM(r.distancia_km), 0) AS km_total
+FROM veiculos v
+LEFT JOIN rotas r ON v.id_veiculo = r.id_veiculo
+GROUP BY v.id_veiculo, v.placa, v.capacidade_peso_kg
+ORDER BY km_total DESC;
+
+-- 10. Clientes PJ em SP ou MG ou com segundo telefone cadastrado (com COALESCE)
+SELECT 
+    c.nome_razao_social,
+    c.documento,
+    c.telefone,
+    COALESCE(c.telefone_2, 'Sem segundo telefone') AS telefone_2,
+    e.municipio,
+    e.estado
+FROM clientes c
+JOIN enderecos e ON c.id_cliente = e.id_cliente
+WHERE c.tipo = 'PJ'
+  AND (c.telefone_2 IS NOT NULL OR e.estado IN ('SP', 'MG'))
+ORDER BY c.nome_razao_social;
+
+-- 11. Pagamentos dentro de um intervalo de datas e faixa de valor (BETWEEN + COALESCE)
+SELECT 
+    dp.id_pagamento,
+    c.nome_razao_social AS cliente,
+    dp.id_pedido,
+    dp.data_pagamento,
+    COALESCE(dp.forma_pagamento, 'Não informado') AS forma_pagamento,
+    dp.valor_pagamento
+FROM dados_pagamentos dp
+JOIN clientes c ON dp.id_cliente = c.id_cliente
+WHERE dp.data_pagamento BETWEEN '2025-07-01' AND '2025-10-31'
+  AND dp.valor_pagamento BETWEEN 1000.00 AND 5000.00
+ORDER BY dp.data_pagamento;
