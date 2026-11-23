@@ -1,0 +1,63 @@
+group: SilverLogisticas
+
+clientes = {
+  id_cliente:number, nome_razao_social:string, tipo:string
+  1, 'Empresa Alfa Ltda', 'PJ'
+  2, 'João da Silva ME', 'PJ'
+  3, 'Maria Oliveira', 'PF'
+  4, 'Distribuidora Cerrado S/A', 'PJ'
+}
+
+enderecos = {
+  id_endereco:number, municipio:string, estado:string, id_cliente:number
+  1, 'São Paulo', 'SP', 1
+  2, 'Rio de Janeiro', 'RJ', 2
+  3, 'Belo Horizonte', 'MG', 3
+  4, 'Patrocínio', 'MG', 4
+}
+
+veiculos = {
+  id_veiculo:number, placa:string, capacidade_peso_kg:number, conservacao_veiculo:string
+  1, 'ABC-1234', 3500, 'Bom'
+  2, 'XYZ-9876', 7000, 'Regular'
+  3, 'XIZ-9676', 9000, 'Ruim'
+  4, 'SLV-2026', 12000, 'Ótimo'
+}
+
+motoristas = {
+  id_motorista:number, nome:string, tipo_cnh:string, valida:boolean
+  1, 'Roberto Dias', 'E', true
+  2, 'Fernanda Lima', 'D', true
+  3, 'Marcos Pereira', 'C', false
+}
+
+pedidos = {
+  id_pedido:number, status_pedido:string, valor_pedido:number, id_cliente:number
+  1, 'Entregue', 1250.00, 1
+  2, 'Entregue', 3400.50, 2
+  3, 'Em Trânsito', 10801.96, 3
+  4, 'Em Trânsito', 3700.50, 4
+}
+
+rotas = {
+  id_rota:number, origem:string, destino:string, distancia_km:number, id_veiculo:number, id_motorista:number
+  1, 'Guarulhos-SP', 'São Paulo-SP', 32.5, 1, 2
+  2, 'Nova Iguaçu-RJ', 'Rio de Janeiro-RJ', 41.0, 2, 1
+  3, 'Patrocínio-MG', 'Belo Horizonte-MG', 415.0, 4, 1
+}
+
+rotas_pedidos = {
+  id_rota:number, id_pedido:number, ordem_entrega:number
+  1, 1, 1
+  2, 2, 1
+  3, 4, 1
+  3, 3, 2
+}
+
+dados_pagamentos = {
+  id_pagamento:number, forma_pagamento:string, valor_pagamento:number, id_cliente:number, id_pedido:number
+  1, 'Cartão de Crédito', 1250.00, 1, 1
+  2, 'Cartão de Débito', 1250.00, 2, 2
+  3, 'Cartão de Crédito', 1250.00, 3, 3
+  4, 'PIX', 2700.49, 4, 4
+}
