@@ -1,0 +1,209 @@
+DROP TABLE IF EXISTS dados_pagamentos CASCADE;
+DROP TABLE IF EXISTS rotas_pedidos CASCADE;
+DROP TABLE IF EXISTS rotas CASCADE;
+DROP TABLE IF EXISTS itens_pedido CASCADE;
+DROP TABLE IF EXISTS pedidos CASCADE;
+DROP TABLE IF EXISTS manutencoes CASCADE;
+DROP TABLE IF EXISTS motoristas CASCADE;
+DROP TABLE IF EXISTS veiculos CASCADE;
+DROP TABLE IF EXISTS funcionarios CASCADE;
+DROP TABLE IF EXISTS armazens CASCADE;
+DROP TABLE IF EXISTS enderecos CASCADE;
+DROP TABLE IF EXISTS clientes CASCADE;
+
+CREATE TABLE clientes (
+    id_cliente INTEGER PRIMARY KEY,
+    nome_razao_social VARCHAR(100) NOT NULL,
+    documento VARCHAR(20) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL,
+    telefone VARCHAR(30) NOT NULL,
+    tipo VARCHAR(10) NOT NULL CHECK (tipo IN ('PF', 'PJ'))
+);
+
+ALTER TABLE clientes ADD COLUMN telefone_2 VARCHAR(30);
+
+CREATE TABLE enderecos (
+    id_endereco INTEGER PRIMARY KEY,
+    cep VARCHAR(9) NOT NULL,
+    logradouro VARCHAR(50) NOT NULL,
+    rua VARCHAR(80) NOT NULL,
+    numero VARCHAR(20) NOT NULL,
+    bairro VARCHAR(50) NOT NULL,
+    municipio VARCHAR(50) NOT NULL,
+    estado CHAR(2) NOT NULL,
+    id_cliente INTEGER NOT NULL,
+    FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente) ON DELETE CASCADE
+);
+
+CREATE TABLE armazens (
+    id_armazem INTEGER PRIMARY KEY,
+    nome_armazem VARCHAR(80) NOT NULL,
+    local_armazem VARCHAR(80) NOT NULL,
+    capacidade_armazem NUMERIC(12,2) NOT NULL CHECK (capacidade_armazem > 0),
+    custo_armazenagem NUMERIC(12,2) NOT NULL DEFAULT 0
+);
+
+CREATE TABLE funcionarios (
+    id_funcionario INTEGER PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    especialidade VARCHAR(100) NOT NULL,
+    cargo VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL UNIQUE,
+    id_armazem INTEGER NOT NULL,
+    FOREIGN KEY (id_armazem) REFERENCES armazens(id_armazem)
+);
+
+CREATE TABLE veiculos (
+    id_veiculo INTEGER PRIMARY KEY,
+    placa VARCHAR(20) NOT NULL UNIQUE,
+    ano_fabricacao INTEGER NOT NULL CHECK (ano_fabricacao >= 1990),
+    capacidade_peso_kg INTEGER NOT NULL CHECK (capacidade_peso_kg > 0),
+    conservacao_veiculo VARCHAR(20) NOT NULL CHECK (conservacao_veiculo IN ('Ótimo', 'Bom', 'Regular', 'Ruim'))
+);
+
+CREATE TABLE motoristas (
+    id_motorista INTEGER PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    cnh VARCHAR(50) NOT NULL UNIQUE,
+    tipo_cnh VARCHAR(10) NOT NULL CHECK (tipo_cnh IN ('B', 'C', 'D', 'E')),
+    valida BOOLEAN NOT NULL DEFAULT TRUE
+);
+
+CREATE TABLE manutencoes (
+    id_manutencao INTEGER PRIMARY KEY,
+    data_manutencao DATE NOT NULL,
+    data_inicio DATE NOT NULL,
+    data_fim DATE,
+    id_veiculo INTEGER NOT NULL,
+    tipo VARCHAR(50) NOT NULL CHECK (tipo IN ('Preventiva', 'Corretiva')),
+    descricao TEXT,
+    custo NUMERIC(10,2) NOT NULL CHECK (custo >= 0),
+    FOREIGN KEY (id_veiculo) REFERENCES veiculos(id_veiculo)
+);
+
+CREATE TABLE pedidos (
+    id_pedido INTEGER PRIMARY KEY,
+    data_pedido DATE NOT NULL DEFAULT CURRENT_DATE,
+    status_pedido VARCHAR(30) NOT NULL DEFAULT 'Em Processamento',
+    valor_pedido NUMERIC(10,2) NOT NULL CHECK (valor_pedido >= 0),
+    local_pedido VARCHAR(50) NOT NULL,
+    qtd INTEGER NOT NULL CHECK (qtd > 0),
+    id_cliente INTEGER NOT NULL,
+    id_endereco_entrega INTEGER NOT NULL,
+    id_armazem_origem INTEGER NOT NULL,
+    FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente),
+    FOREIGN KEY (id_endereco_entrega) REFERENCES enderecos(id_endereco),
+    FOREIGN KEY (id_armazem_origem) REFERENCES armazens(id_armazem)
+);
+
+CREATE TABLE itens_pedido (
+    id_item INTEGER PRIMARY KEY,
+    id_pedido INTEGER NOT NULL,
+    qtd_item INTEGER NOT NULL CHECK (qtd_item > 0),
+    valor_unit NUMERIC(10,2) NOT NULL CHECK (valor_unit >= 0),
+    descricao_item TEXT NOT NULL,
+    FOREIGN KEY (id_pedido) REFERENCES pedidos(id_pedido) ON DELETE CASCADE
+);
+
+CREATE TABLE rotas (
+    id_rota INTEGER PRIMARY KEY,
+    origem VARCHAR(100) NOT NULL,
+    destino VARCHAR(100) NOT NULL,
+    distancia_km NUMERIC(8,2) NOT NULL CHECK (distancia_km > 0),
+    tempo_estimado INTERVAL NOT NULL,
+    id_veiculo INTEGER NOT NULL,
+    id_motorista INTEGER NOT NULL,
+    FOREIGN KEY (id_veiculo) REFERENCES veiculos(id_veiculo),
+    FOREIGN KEY (id_motorista) REFERENCES motoristas(id_motorista)
+);
+
+CREATE TABLE rotas_pedidos (
+    id_rota INTEGER NOT NULL,
+    id_pedido INTEGER NOT NULL,
+    ordem_entrega INTEGER NOT NULL CHECK (ordem_entrega > 0),
+    PRIMARY KEY (id_rota, id_pedido),
+    FOREIGN KEY (id_rota) REFERENCES rotas(id_rota) ON DELETE CASCADE,
+    FOREIGN KEY (id_pedido) REFERENCES pedidos(id_pedido) ON DELETE CASCADE
+);
+
+CREATE TABLE dados_pagamentos (
+    id_pagamento INTEGER PRIMARY KEY,
+    data_pagamento DATE NOT NULL,
+    forma_pagamento VARCHAR(50) NOT NULL,
+    valor_pagamento NUMERIC(10,2) NOT NULL CHECK (valor_pagamento > 0),
+    id_cliente INTEGER NOT NULL,
+    id_pedido INTEGER NOT NULL,
+    FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente),
+    FOREIGN KEY (id_pedido) REFERENCES pedidos(id_pedido)
+);
+
+ALTER TABLE clientes ADD COLUMN telefone_2 VARCHAR(30);
+
+INSERT INTO clientes (id_cliente, nome_razao_social, documento, email, telefone, tipo, telefone_2) VALUES
+(1, 'Empresa Alfa Ltda', '12.345.678/0001-90', 'contato@alfa.com', '(11) 98765-4321', 'PJ', '(11) 3333-4444'),
+(2, 'João da Silva ME', '98.765.432/0001-12', 'joao@silva.com', '(21) 91234-5678', 'PJ', NULL),
+(3, 'Maria Oliveira', '123.456.789-00', 'maria@email.com', '(31) 99887-7665', 'PF', '(31) 3222-1111'),
+(4, 'Distribuidora Cerrado S/A', '45.678.912/0001-33', 'logistica@cerrado.com.br', '(34) 99112-2334', 'PJ', NULL);
+
+INSERT INTO enderecos (id_endereco, cep, logradouro, rua, numero, bairro, municipio, estado, id_cliente) VALUES
+(1, '01001-000', 'Avenida', 'Rio Branco', '100', 'Centro', 'São Paulo', 'SP', 1),
+(2, '20040-020', 'Rua', 'Do Ouvidor', '45', 'Centro', 'Rio de Janeiro', 'RJ', 2),
+(3, '30130-100', 'Praça', 'da Liberdade', '200', 'Savassi', 'Belo Horizonte', 'MG', 3),
+(4, '38740-000', 'Avenida', 'Rui Barbosa', '510', 'Centro', 'Patrocínio', 'MG', 4);
+
+INSERT INTO armazens (id_armazem, nome_armazem, local_armazem, capacidade_armazem, custo_armazenagem) VALUES
+(1, 'Centro de Distribuição SP', 'Guarulhos-SP', 50000.50, 15000.00),
+(2, 'Depósito RJ', 'Nova Iguaçu-RJ', 30000.00, 9500.00),
+(3, 'Hub Cerrado MG', 'Patrocínio-MG', 38000.00, 10800.00);
+
+INSERT INTO funcionarios (id_funcionario, nome, especialidade, cargo, email, id_armazem) VALUES
+(1, 'Carlos Santos', 'Logística Reversa', 'Gerente de Operações', 'carlos@empresa.com', 1),
+(2, 'Ana Souza', 'Gestão de Estoque', 'Assistente de Logística', 'ana@empresa.com', 2),
+(3, 'Lucas Mendes', 'Roteirização', 'Analista de Transportes', 'lucas@empresa.com', 3);
+
+INSERT INTO veiculos (id_veiculo, placa, ano_fabricacao, capacidade_peso_kg, conservacao_veiculo) VALUES
+(1, 'ABC-1234', 2021, 3500, 'Bom'),
+(2, 'XYZ-9876', 2019, 7000, 'Regular'),
+(3, 'XIZ-9676', 2011, 9000, 'Ruim'),
+(4, 'SLV-2026', 2024, 12000, 'Ótimo');
+
+INSERT INTO motoristas (id_motorista, nome, cnh, tipo_cnh, valida) VALUES
+(1, 'Roberto Dias', '12345678900', 'E', TRUE),
+(2, 'Fernanda Lima', '98765432100', 'D', TRUE),
+(3, 'Marcos Pereira', '55566677788', 'C', FALSE);
+
+INSERT INTO manutencoes (id_manutencao, data_manutencao, data_inicio, data_fim, id_veiculo, tipo, descricao, custo) VALUES
+(1, '2026-01-15', '2026-01-15', '2026-01-16', 1, 'Preventiva', 'Troca de óleo e filtros', 450.00),
+(2, '2026-02-10', '2026-02-10', '2026-02-14', 3, 'Corretiva', 'Revisão de freios e suspensão', 3100.00);
+
+INSERT INTO pedidos (id_pedido, data_pedido, status_pedido, valor_pedido, local_pedido, qtd, id_cliente, id_endereco_entrega, id_armazem_origem) VALUES
+(1, '2025-07-01', 'Entregue', 1250.00, 'São Paulo', 5, 1, 1, 1),
+(2, '2025-08-19', 'Entregue', 3400.50, 'Rio de Janeiro', 2, 2, 2, 2),
+(3, '2025-11-05', 'Em Trânsito', 10801.96, 'Belo Horizonte', 4, 3, 3, 3),
+(4, '2025-09-26', 'Em Trânsito', 3700.50, 'Patrocínio', 1, 4, 4, 3);
+
+INSERT INTO itens_pedido (id_item, id_pedido, qtd_item, valor_unit, descricao_item) VALUES
+(1, 1, 3, 250.00, 'Caixa de Papelão Reforçada'),
+(2, 1, 2, 250.00, 'Fita Adesiva Industrial'),
+(3, 2, 2, 1700.25, 'Palete de Madeira'),
+(4, 3, 4, 2700.49, 'Computador para Edição de Vídeo'),
+(5, 4, 1, 3700.50, 'Compressor Industrial');
+
+INSERT INTO rotas (id_rota, origem, destino, distancia_km, tempo_estimado, id_veiculo, id_motorista) VALUES
+(1, 'Guarulhos-SP', 'São Paulo-SP', 32.50, '01:15:00', 1, 2),
+(2, 'Nova Iguaçu-RJ', 'Rio de Janeiro-RJ', 41.00, '01:30:00', 2, 1),
+(3, 'Patrocínio-MG', 'Belo Horizonte-MG', 415.00, '05:50:00', 4, 1);
+
+INSERT INTO rotas_pedidos (id_rota, id_pedido, ordem_entrega) VALUES
+(1, 1, 1),
+(2, 2, 1),
+(3, 4, 1),
+(3, 3, 2);
+
+INSERT INTO dados_pagamentos (id_pagamento, data_pagamento, forma_pagamento, valor_pagamento, id_cliente, id_pedido) VALUES
+(1, '2025-07-02', 'Cartão de Crédito', 1250.00, 1, 1),
+(2, '2025-08-20', 'Cartão de Débito', 1250.00, 2, 2),
+(3, '2025-11-06', 'Cartão de Crédito', 1250.00, 3, 3),
+(4, '2025-09-27', 'PIX', 2700.49, 4, 4);
+
+UPDATE veiculos SET conservacao_veiculo = 'Regular' WHERE id_veiculo = 3;
