@@ -1,0 +1,41 @@
+CREATE TABLE leitores( 
+id_leitor SERIAL  PRIMARY KEY,                                                                      
+ nome varchar(100) not null,                                    
+  email varchar(100) UNIQUE,  
+ ativo boolean DEFAULT TRUE
+);
+CREATE TABLE emprestimos(
+id_emprestimo SERIAL PRIMARY KEY,
+id_leitor INTEGER ,
+titulo_livro varchar(150) not null, 
+data_devolucao DATE, 
+multa NUMERIC(6,2)DEFAULT 0.00 CHECK(  multa >= 0 ),
+FOREIGN KEY (id_leitor) REFERENCES leitores(id_leitor) ON DELETE SET NULL
+);
+INSERT INTO leitores (nome,email) 
+VALUES 
+('Carlos Silva','carlos@email.com'),
+('Mariana Costa','mariana@email.com'),
+('Joao Pedro','joao@email.com');
+INSERT INTO emprestimos(id_leitor,titulo_livro,data_devolucao)
+VALUES 
+(1,'clean code','2026-11-10'),
+(2,'entendo algoritimos',NULL);
+INSERT INTO emprestimos(id_leitor,titulo_livro,data_devolucao,multa)
+VALUES
+(1,'programador pragmatico',NULL,15.50);
+SELECT titulo_livro,multa
+FROM emprestimos
+WHERE data_devolucao IS NULL;
+
+SELECT l.nome , e.titulo_livro 
+FROM leitores l
+LEFT JOIN emprestimos e
+ON l.id_leitor = e.id_leitor
+
+SELECT l.nome,SUM(e.multa)  
+FROM leitores l
+INNER JOIN emprestimos e
+ON l.id_leitor = e.id_leitor
+GROUP BY l.id_leitor , l.nome
+HAVING SUM (e.multa) > 10;
