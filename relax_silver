@@ -1,11 +1,11 @@
 group: SilverLogisticas
 
 clientes = {
-  id_cliente:number, nome_razao_social:string, tipo:string
-  1, 'Empresa Alfa Ltda', 'PJ'
-  2, 'João da Silva ME', 'PJ'
-  3, 'Maria Oliveira', 'PF'
-  4, 'Distribuidora Cerrado S/A', 'PJ'
+  id_cliente:number, nome_razao_social:string, documento:string, tipo:string, telefone:string, telefone_2:string
+  1, 'Empresa Alfa Ltda', '12.345.678/0001-90', 'PJ', '11999991111', null
+  2, 'João da Silva ME', '23.456.789/0001-01', 'PJ', '21999992222', '21988882222'
+  3, 'Maria Oliveira', '123.456.789-00', 'PF', '31999993333', null
+  4, 'Distribuidora Cerrado S/A', '34.567.890/0001-12', 'PJ', '34999994444', '34988884444'
 }
 
 enderecos = {
@@ -16,6 +16,21 @@ enderecos = {
   4, 'Patrocínio', 'MG', 4
 }
 
+armazens = {
+  id_armazem:number, nome_armazem:string, local_armazem:string, custo_armazem:number
+  1, 'Hub Sudeste', 'Guarulhos-SP', 18500.00
+  2, 'Centro Fluminense', 'Nova Iguaçu-RJ', 12400.00
+  3, 'Filial Cerrado', 'Patrocínio-MG', 9800.00
+}
+
+funcionarios = {
+  id_funcionario:number, nome_funcionario:string, cargo:string, id_armazem:number
+  1, 'Carlos Mendes', 'Operador de Estoque', 1
+  2, 'Ana Souza', 'Conferente', 1
+  3, 'Lucas Rocha', 'Supervisor Logístico', 2
+  4, 'Juliana Costa', 'Assistente Administrativo', 3
+}
+
 veiculos = {
   id_veiculo:number, placa:string, capacidade_peso_kg:number, conservacao_veiculo:string
   1, 'ABC-1234', 3500, 'Bom'
@@ -24,19 +39,36 @@ veiculos = {
   4, 'SLV-2026', 12000, 'Ótimo'
 }
 
+manutencoes = {
+  id_manutencao:number, descricao_manutencao:string, custo:number, id_veiculo:number
+  1, 'Troca de pastilhas e revisão de freios', 1450.00, 1
+  2, 'Alinhamento, balanceamento e pneus', 3200.00, 2
+  3, 'Retífica de embreagem e sistema hidráulico', 5800.00, 3
+  4, 'Revisão preventiva de 10.000 km', 1900.00, 4
+}
+
 motoristas = {
   id_motorista:number, nome:string, tipo_cnh:string, valida:boolean
   1, 'Roberto Dias', 'E', true
   2, 'Fernanda Lima', 'D', true
   3, 'Marcos Pereira', 'C', false
+  4, 'Patrícia Alves', 'E', true
 }
 
 pedidos = {
-  id_pedido:number, status_pedido:string, valor_pedido:number, id_cliente:number
-  1, 'Entregue', 1250.00, 1
-  2, 'Entregue', 3400.50, 2
-  3, 'Em Trânsito', 10801.96, 3
-  4, 'Em Trânsito', 3700.50, 4
+  id_pedido:number, local_pedido:string, status_pedido:string, valor_pedido:number, id_cliente:number, id_armazem:number
+  1, 'São Paulo-SP', 'Entregue', 1250.00, 1, 1
+  2, 'Rio de Janeiro-RJ', 'Entregue', 3400.50, 2, 2
+  3, 'Belo Horizonte-MG', 'Em Trânsito', 10801.96, 3, 3
+  4, 'Patrocínio-MG', 'Em Trânsito', 3700.50, 4, 3
+}
+
+itens_pedido = {
+  id_item:number, id_pedido:number, descricao_item:string, qtd_item:number, valor_unit:number
+  1, 1, 'Caixa Térmica Industrial', 5, 250.00
+  1, 2, 'Pallet Reforçado', 10, 340.05
+  1, 3, 'Rack Metálico Pesado', 4, 2700.49
+  1, 4, 'Container Plástico Retornável', 50, 74.01
 }
 
 rotas = {
@@ -55,9 +87,9 @@ rotas_pedidos = {
 }
 
 dados_pagamentos = {
-  id_pagamento:number, forma_pagamento:string, valor_pagamento:number, id_cliente:number, id_pedido:number
-  1, 'Cartão de Crédito', 1250.00, 1, 1
-  2, 'Cartão de Débito', 1250.00, 2, 2
-  3, 'Cartão de Crédito', 1250.00, 3, 3
-  4, 'PIX', 2700.49, 4, 4
+  id_pagamento:number, forma_pagamento:string, data_pagamento:string, valor_pagamento:number, id_cliente:number, id_pedido:number
+  1, 'Cartão de Crédito', '2025-07-15', 1250.00, 1, 1
+  2, 'Cartão de Débito', '2025-08-20', 1250.00, 2, 2
+  3, 'Cartão de Crédito', '2025-09-10', 1250.00, 3, 3
+  4, 'PIX', '2025-10-05', 2700.49, 4, 4
 }
